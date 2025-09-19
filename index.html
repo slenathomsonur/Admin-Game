@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Admin Tester</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1117, #161b22);
+            color: #c9d1d9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .github-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .github-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f0f6fc;
+            margin-right: 10px;
+        }
+        
+        .header-divider {
+            margin: 0 10px;
+            color: #30363d;
+        }
+        
+        .repo-name {
+            font-weight: 500;
+            color: #58a6ff;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .toolbar {
+            background: #161b22;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .window-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .close { background: #f85149; }
+        .minimize { background: #f2c94c; }
+        .maximize { background: #3fb950; }
+        
+        .toolbar-title {
+            font-size: 0.9rem;
+            color: #8b949e;
+        }
+        
+        .terminal {
+            padding: 20px;
+            height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            background: #0d1117;
+        }
+        
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .prompt {
+            color: #3fb950;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        
+        .command-input {
+            background: transparent;
+            border: none;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+            caret-color: #58a6ff;
+        }
+        
+        .output {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .success { color: #3fb950; }
+        .error { color: #f85149; }
+        .warning { color: #f2c94c; }
+        .info { color: #58a6ff; }
+        .muted { color: #6e7681; }
+        
+        .command-history {
+            margin-bottom: 20px;
+        }
+        
+        .help-section {
+            margin-top: 30px;
+            padding: 15px;
+            background: #161b22;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+        }
+        
+        .help-title {
+            color: #58a6ff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .command-list {
+            list-style-type: none;
+        }
+        
+        .command-list li {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .command-list li:before {
+            content: "$";
+            position: absolute;
+            left: 0;
+            color: #3fb950;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #6e7681;
+            font-size: 0.9rem;
+        }
+        
+        .blinking-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #58a6ff;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .github-header {
+                justify-content: center;
+            }
+            
+            .terminal {
+                height: 400px;
+                padding: 15px;
+            }
+        }
+        
+        .glitch-effect {
+            animation: glitch 1s linear infinite;
+        }
+        
+        @keyframes glitch {
+            0% { text-shadow: 1px 1px #ff0000, -1px -1px #00ffff; }
+            100% { text-shadow: 2px 2px #ff0000, -2px -2px #00ffff; }
+        }
+    </style>
+</head>
+<body>
+    <div class="github-header">
+        <div class="github-logo">GitHub</div>
+        <span class="header-divider">/</span>
+        <div class="repo-name">admin-tester</div>
+    </div>
+    
+    <div class="container">
+        <div class="toolbar">
+            <div class="window-controls">
+                <div class="window-control close"></div>
+                <div class="window-control minimize"></div>
+                <div class="window-control maximize"></div>
+            </div>
+            <div class="toolbar-title">GitHub Admin Terminal</div>
+            <div></div> <!-- Spacer for flexbox alignment -->
+        </div>
+        
+        <div class="terminal" id="terminal">
+            <div class="output">
+                <div class="info">GitHub Admin Tester v1.0.0</div>
+                <div class="muted">Simulated environment for testing GitHub admin commands</div>
+                <div class="muted">Type 'help' to see available commands</div>
+            </div>
+            
+            <div class="command-history" id="command-history"></div>
+            
+            <div class="command-line">
+                <span class="prompt">admin@github:~$</span>
+                <input type="text" class="command-input" id="command-input" autofocus>
+                <span class="blinking-cursor"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="help-section">
+        <div class="help-title">Available Commands:</div>
+        <ul class="command-list">
+            <li><span class="info">help</span> - Show this help message</li>
+            <li><span class="info">user</span> - Simulate user management commands</li>
+            <li><span class="info">repo</span> - Simulate repository management commands</li>
+            <li><span class="info">org</span> - Simulate organization management commands</li>
+            <li><span class="info">access</span> - Simulate access control commands</li>
+            <li><span class="info">audit</span> - Simulate audit log commands</li>
+            <li><span class="info">clear</span> - Clear the terminal screen</li>
+        </ul>
+    </div>
+    
+    <div class="footer">
+        <p>GitHub Admin Tester Simulation &copy; 2023 - This is a simulation only. No real commands are executed.</p>
+    </div>
+
+    <script>
+        // Command database
+        const commands = {
+            help: {
+                execute: () => {
+                    return `<div class="info">Available Commands:</div>
+                    <div class="muted">user - Simulate user management commands</div>
+                    <div class="muted">repo - Simulate repository management commands</div>
+                    <div class="muted">org - Simulate organization management commands</div>
+                    <div class="muted">access - Simulate access control commands</div>
+                    <div class="muted">audit - Simulate audit log commands</div>
+                    <div class="muted">clear - Clear the terminal screen</div>
+                    <div class="muted">Type any of these commands to see simulated admin actions</div>`;
+                }
+            },
+            
+            user: {
+                execute: () => {
+                    const actions = [
+                        "Listing all users...",
+                        "Checking user permissions...",
+                        "Simulating user role change...",
+                        "Resetting user 2FA...",
+                        "Verifying user email addresses...",
+                        "Suspending inactive users..."
+                    ];
+                    
+                    let output = `<div class="info">GitHub User Management Module</div>`;
+                    for (let i = 0; i < 3; i++) {
+                        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+                        output += `<div class="success">✓ ${randomAction}</div>`;
+                    }
+                    output += `<div class="success">User management simulation completed successfully</div>`;
+                    return output;
+                }
+            },
+            
+            repo: {
+                execute: () => {
+                    const repos = [
+                        "admin-tester", "github-clone", "docs", "api-server", "frontend", "backend"
+                    ];
+                    
+                    let output = `<div class="info">GitHub Repository Management Module</div>`;
+                    output += `<div class="muted">Found ${repos.length} repositories</div>`;
+                    
+                    repos.forEach(repo => {
+                        const status = Math.random() > 0.2 ? "success" : "warning";
+                        const statusText = status === "success" ? "OK" : "Needs attention";
+                        output += `<div class="${status}">${repo} - ${statusText}</div>`;
+                    });
+                    
+                    output += `<div class="info">Running repository analytics...</div>`;
+                    output += `<div class="success">Repository management simulation completed</div>`;
+                    return output;
+                }
+            },
+            
+            org: {
+                execute: () => {
+                    const orgs = [
+                        { name: "github", members: 245, teams: 12 },
+                        { name: "microsoft", members: 1890, teams: 56 },
+                        { name: "facebook", members: 956, teams: 34 }
+                    ];
+                    
+                    let output = `<div class="info">GitHub Organization Management Module</div>`;
+                    
+                    orgs.forEach(org => {
+                        output += `<div class="info">Organization: ${org.name}</div>`;
+                        output += `<div class="muted">Members: ${org.members}, Teams: ${org.teams}</div>`;
+                    });
+                    
+                    output += `<div class="info">Checking organization permissions...</div>`;
+                    output += `<div class="success">Organization management simulation completed</div>`;
+                    return output;
+                }
+            },
+            
+            access: {
+                execute: () => {
+                    let output = `<div class="info">GitHub Access Control Module</div>`;
+                    output += `<div class="muted">Reviewing access controls...</div>`;
+                    
+                    // Simulate access control checks
+                    for (let i = 0; i < 4; i++) {
+                        const resource = ["Repositories", "Teams", "Projects", "Packages"][i];
+                        const status = Math.random() > 0.3 ? "success" : "warning";
+                        const statusText = status === "success" ? "Secure" : "Needs review";
+                        output += `<div class="${status}">${resource} access - ${statusText}</div>`;
+                    }
+                    
+                    output += `<div class="info">Running security audit...</div>`;
+                    output += `<div class="success">Access control simulation completed</div>`;
+                    return output;
+                }
+            },
+            
+            audit: {
+                execute: () => {
+                    const events = [
+                        "user.login", "repo.create", "org.invite", "team.delete", "branch.protect"
+                    ];
+                    
+                    const users = ["admin", "john-doe", "jane-smith", "automation-bot"];
+                    
+                    let output = `<div class="info">GitHub Audit Log Module</div>`;
+                    output += `<div class="muted">Generating recent audit events...</div>`;
+                    
+                    // Generate random audit events
+                    for (let i = 0; i < 5; i++) {
+                        const event = events[Math.floor(Math.random() * events.length)];
+                        const user = users[Math.floor(Math.random() * users.length)];
+                        const time = `${Math.floor(Math.random() * 23)}:${Math.floor(Math.random() * 59)}`;
+                        output += `<div class="muted">[${time}] ${user} performed ${event}</div>`;
+                    }
+                    
+                    output += `<div class="success">Audit log simulation completed</div>`;
+                    return output;
+                }
+            },
+            
+            clear: {
+                execute: () => {
+                    const commandHistory = document.getElementById('command-history');
+                    commandHistory.innerHTML = '';
+                    return '';
+                }
+            },
+            
+            // Easter egg commands
+            sudo: {
+                execute: () => {
+                    return `<div class="error">Permission denied. This is a simulation only.</div>`;
+                }
+            },
+            
+            rm: {
+                execute: () => {
+                    return `<div class="error">⚠️  This action is destructive and not allowed in simulation mode.</div>`;
+                }
+            },
+            
+            hack: {
+                execute: () => {
+                    return `<div class="glitch-effect error">🚫 Unauthorized access attempt detected 🚫</div>`;
+                }
+            }
+        };
+
+        // Initialize terminal
+        const commandInput = document.getElementById('command-input');
+        const commandHistory = document.getElementById('command-history');
+        const terminal = document.getElementById('terminal');
+
+        commandInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const commandText = this.value.trim();
+                this.value = '';
+                
+                // Add command to history
+                const commandLine = document.createElement('div');
+                commandLine.className = 'output';
+                commandLine.innerHTML = `<div><span class="prompt">admin@github:~$</span> ${commandText}</div>`;
+                commandHistory.appendChild(commandLine);
+                
+                // Process command
+                let output = '';
+                if (commandText) {
+                    const command = commands[commandText.toLowerCase()];
+                    if (command) {
+                        output = command.execute();
+                    } else {
+                        output = `<div class="error">Command not found: ${commandText}. Type 'help' for available commands.</div>`;
+                    }
+                    
+                    if (output) {
+                        const outputElement = document.createElement('div');
+                        outputElement.className = 'output';
+                        outputElement.innerHTML = output;
+                        commandHistory.appendChild(outputElement);
+                    }
+                }
+                
+                // Scroll to bottom
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        });
+
+        // Focus input when clicking anywhere in the terminal
+        terminal.addEventListener('click', function() {
+            commandInput.focus();
+        });
+    </script>
+</body>
+</html>
